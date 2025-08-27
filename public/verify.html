@@ -1,0 +1,229 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Verify Certificate</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.9.0/dist/web3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px 30px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      animation: fadeIn 0.7s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 25px;
+      color: #2563eb;
+    }
+
+    label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: block;
+      margin-top: 18px;
+      color: #374151;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin-top: 8px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      color: #111827;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+    }
+
+    input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 6px rgba(37,99,235,0.4);
+      outline: none;
+      background: #fff;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 22px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(90deg, #2563eb, #06b6d4);
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(37,99,235,0.4);
+    }
+
+    #output {
+      margin-top: 20px;
+      background: #f9fafb;
+      padding: 18px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      word-wrap: break-word;
+    }
+
+    a { color: #2563eb; text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Verify Certificate</h1>
+    <label>Certificate ID
+      <input id="certId" type="text" placeholder="Enter certificate ID" />
+    </label>
+    <button id="verifyBtn">Verify</button>
+    <div id="output"></div>
+  </div>
+
+  <script>
+    const CONTRACT_ADDRESS = "0xA0ff398E0c7e7f827196Aba550D3eF3F243c330a";
+    const CONTRACT_ABI = [
+      {
+        "inputs": [
+          { "internalType": "string", "name": "", "type": "string" }
+        ],
+        "name": "certificates",
+        "outputs": [
+          { "internalType": "string", "name": "studentName", "type": "string" },
+          { "internalType": "string", "name": "studentDetails", "type": "string" },
+          { "internalType": "string", "name": "dateOfBirth", "type": "string" },
+          { "internalType": "string", "name": "ipfsHash", "type": "string" },
+          { "internalType": "address", "name": "uploader", "type": "address" }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+      },
+      {
+        "inputs": [
+          { "internalType": "string", "name": "_certId", "type": "string" },
+          { "internalType": "string", "name": "_name", "type": "string" },
+          { "internalType": "string", "name": "_details", "type": "string" },
+          { "internalType": "string", "name": "_dob", "type": "string" },
+          { "internalType": "string", "name": "_ipfsHash", "type": "string" }
+        ],
+        "name": "addCertificate",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          { "internalType": "string", "name": "_certId", "type": "string" }
+        ],
+        "name": "getCertificate",
+        "outputs": [
+          { "internalType": "string", "name": "", "type": "string" },
+          { "internalType": "string", "name": "", "type": "string" },
+          { "internalType": "string", "name": "", "type": "string" },
+          { "internalType": "string", "name": "", "type": "string" },
+          { "internalType": "address", "name": "", "type": "address" }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+      }
+    ];
+
+    const web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:7545"));
+    const contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+
+    function escapeHtml(text) {
+      if (typeof text !== 'string') return text;
+      return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    async function onVerifyClicked() {
+      try {
+        const id = document.getElementById('certId').value.trim();
+        if (!id) { alert('Enter certificate ID'); return; }
+
+        const res = await contract.methods.getCertificate(id).call();
+        if (!res || !res[0]) {
+          document.getElementById('output').innerHTML = '<b>Certificate not found.</b>';
+          return;
+        }
+
+        const name = escapeHtml(res[0]);
+        const details = escapeHtml(res[1]);
+        const dob = escapeHtml(res[2]);
+        const ipfsHash = res[3];
+        const uploader = escapeHtml(res[4]);
+
+        const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
+
+        document.getElementById('output').innerHTML =
+          `<b>Name:</b> ${name}<br>
+           <b>Details:</b> ${details}<br>
+           <b>DOB:</b> ${dob}<br>
+           <b>Department Id:</b> ${uploader}<br>
+           <b>File:</b> <a href="${ipfsUrl}" target="_blank">${ipfsUrl}</a>
+           <div id="qr" style="margin-top:12px"></div>`;
+
+        QRCode.toDataURL(ipfsUrl).then(url => {
+          const img = document.createElement('img');
+          img.src = url;
+          img.style.maxWidth = '220px';
+          document.getElementById('qr').appendChild(img);
+
+          const downloadBtn = document.createElement('button');
+          downloadBtn.textContent = 'Download QR Code';
+          downloadBtn.style.marginTop = '10px';
+          downloadBtn.onclick = () => {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${id}_QRCode.png`;
+            a.click();
+          };
+          document.getElementById('qr').appendChild(downloadBtn);
+        });
+
+      } catch (err) {
+        document.getElementById('output').innerHTML = 'Error: ' + (err.message || err);
+      }
+    }
+
+    document.getElementById('verifyBtn').addEventListener('click', onVerifyClicked);
+  </script>
+</body>
+</html>

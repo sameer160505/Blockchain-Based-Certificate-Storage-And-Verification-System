@@ -1,0 +1,239 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Add Certificate</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.9.0/dist/web3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px 30px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      animation: fadeIn 0.7s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 25px;
+      color: #2563eb;
+    }
+
+    label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: block;
+      margin-top: 18px;
+      color: #374151;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 14px;
+      margin-top: 8px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      color: #111827;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 6px rgba(37,99,235,0.4);
+      outline: none;
+      background: #fff;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 22px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(90deg, #2563eb, #06b6d4);
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(37,99,235,0.4);
+    }
+
+    #result {
+      margin-top: 20px;
+      background: #f9fafb;
+      padding: 18px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      word-wrap: break-word;
+    }
+
+    #accountMsg {
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: 10px;
+      color: #6b7280;
+    }
+
+    a { color: #2563eb; text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Add Certificate</h1>
+    <button id="connectBtn">Connect MetaMask</button>
+    <p id="accountMsg"></p>
+
+    <label>Student Name
+      <input id="name" type="text" placeholder="e.g. Inzamam al Sameer" />
+    </label>
+    <label>Student Details
+      <textarea id="details" rows="3" placeholder="e.g. B.E CS - Roll 510422149017"></textarea>
+    </label>
+    <label>Date of Birth
+      <input id="dob" type="date" />
+    </label>
+    <label>Certificate File
+      <input id="file" type="file" accept=".pdf,image/*" />
+    </label>
+
+    <button id="uploadBtn">Upload to IPFS & Save</button>
+    <div id="result"></div>
+  </div>
+
+  <!-- ✅ Script unchanged (same features as before) -->
+  <script>
+    const CONTRACT_ADDRESS = "0xA0ff398E0c7e7f827196Aba550D3eF3F243c330a";
+    const CONTRACT_ABI = [
+      {
+        "inputs":[
+          {"internalType":"string","name":"_certId","type":"string"},
+          {"internalType":"string","name":"_name","type":"string"},
+          {"internalType":"string","name":"_details","type":"string"},
+          {"internalType":"string","name":"_dob","type":"string"},
+          {"internalType":"string","name":"_ipfsHash","type":"string"}
+        ],
+        "name":"addCertificate",
+        "outputs":[],
+        "stateMutability":"nonpayable",
+        "type":"function"
+      }
+    ];
+
+    let web3, account, contract;
+
+    function generateCertId() { return 'CERT-' + Date.now(); }
+    function show(msg) { document.getElementById('result').innerHTML = msg; }
+
+    async function connectMetaMask() {
+      if (!window.ethereum) { alert('Install MetaMask first.'); return; }
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      web3 = new Web3(window.ethereum);
+      const accounts = await web3.eth.getAccounts();
+      account = accounts[0];
+      contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+      document.getElementById('accountMsg').innerText = 'Connected: ' + account;
+    }
+
+    async function uploadFileToServer(file) {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+      return data.ipfsHash;
+    }
+
+    async function onUploadClicked() {
+      try {
+        if (!contract || !account) { alert('Connect MetaMask first.'); return; }
+        const name = document.getElementById('name').value.trim();
+        const details = document.getElementById('details').value.trim();
+        const dob = document.getElementById('dob').value;
+        const fileInput = document.getElementById('file');
+        if (!name || !dob || !fileInput.files.length) { alert('Fill all fields.'); return; }
+        const file = fileInput.files[0];
+        show('Uploading to IPFS...');
+
+        const ipfsHash = await uploadFileToServer(file);
+        const certId = generateCertId();
+        show('Saving to blockchain...');
+
+        await contract.methods.addCertificate(certId, name, details, dob, ipfsHash).send({ from: account });
+
+        const verifyUrl = `${window.location.origin}/verify.html?id=${encodeURIComponent(certId)}`;
+        const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
+
+        show(
+          `<b>Success!</b><br>
+          <b>Certificate ID:</b> ${certId}<br>
+          <b>Verify:</b> <a href="${verifyUrl}" target="_blank">${verifyUrl}</a><br>
+          <b>File:</b> <a href="${ipfsUrl}" target="_blank">${ipfsUrl}</a>
+          <div id="qr"></div>`
+        );
+
+        QRCode.toDataURL(verifyUrl).then(url => {
+          const img = document.createElement('img');
+          img.src = url;
+          img.style.maxWidth = '220px';
+          img.style.marginTop = '12px';
+          document.getElementById('qr').appendChild(img);
+
+          const downloadBtn = document.createElement('button');
+          downloadBtn.textContent = 'Download QR Code';
+          downloadBtn.style.marginTop = '10px';
+          downloadBtn.onclick = () => {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${certId}_QRCode.png`;
+            a.click();
+          };
+          document.getElementById('qr').appendChild(downloadBtn);
+        });
+
+      } catch (err) {
+        alert('Error: ' + err.message);
+        show('Error: ' + err.message);
+      }
+    }
+
+    document.getElementById('connectBtn').addEventListener('click', connectMetaMask);
+    document.getElementById('uploadBtn').addEventListener('click', onUploadClicked);
+    if (window.ethereum && window.ethereum.selectedAddress) connectMetaMask();
+  </script>
+</body>
+</html>
