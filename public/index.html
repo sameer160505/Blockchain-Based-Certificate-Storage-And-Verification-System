@@ -1,157 +1,181 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Add Certificate</title>
+  <title>Aruani Engineering College — Add Certificate</title>
+
+  <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/web3@1.9.0/dist/web3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    :root{
+      --primary:#0b61d3;
+      --accent:#06b6d4;
+      --muted:#6b7280;
+      --card:#ffffff;
+      --surface:#f9fafb;
+      --radius:14px;
+      --max-width:900px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,Segoe UI,Roboto;
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      color:#0f1724;
+      overflow-x:hidden;
 
-    * { box-sizing: border-box; }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f3f4f6;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+      /* Animated gradient background */
+      background: linear-gradient(270deg, #0b61d3, #06b6d4, #4f46e5);
+      background-size: 600% 600%;
+      animation: gradientMove 18s ease infinite;
     }
 
-    .container {
-      width: 100%;
-      max-width: 600px;
-      background: #fff;
-      border-radius: 16px;
-      padding: 40px 30px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-      animation: fadeIn 0.7s ease;
+    @keyframes gradientMove {
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .frame{
+      width:100%;
+      max-width:var(--max-width);
+      display:flex;
+      flex-direction:column;
+      gap:24px;
+      padding:28px;
+      border-radius:var(--radius);
+      background:rgba(255,255,255,0.85);
+      box-shadow:0 10px 40px rgba(0,0,0,0.15);
+      animation: fadeInUp 1s ease;
     }
 
-    h1 {
-      text-align: center;
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 25px;
-      color: #2563eb;
+    @keyframes fadeInUp {
+      from {opacity:0; transform:translateY(20px);}
+      to {opacity:1; transform:translateY(0);}
     }
 
-    label {
-      font-size: 0.9rem;
-      font-weight: 600;
-      display: block;
-      margin-top: 18px;
-      color: #374151;
+    /* header */
+    .header{display:flex; align-items:center; justify-content:space-between}
+    .brand{display:flex; gap:10px; align-items:center}
+    .logo{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.9rem}
+    .org h2{margin:0;font-size:1.1rem;color:var(--primary)}
+    .org p{margin:0;font-size:0.9rem;color:var(--muted)}
+
+    .top-actions{display:flex; align-items:center; gap:12px;}
+    .connect-btn{
+      padding:10px 16px; border-radius:12px; border:none; cursor:pointer;
+      background:linear-gradient(90deg,var(--primary),var(--accent)); color:white; font-weight:600;
+      transition:transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .connect-btn:hover{transform:translateY(-2px); box-shadow:0 6px 14px rgba(11,97,211,0.25);}
+    #accountDisplay{font-size:0.9rem; color:var(--muted)}
+
+    /* form card */
+    .card{
+      background:var(--card); border-radius:var(--radius); padding:28px;
+      box-shadow:0 8px 30px rgba(2,6,23,0.08);
+      animation: fadeInUp 1.2s ease;
+    }
+    .card h1{margin:0 0 16px 0; color:var(--primary); font-size:1.3rem}
+    label{display:block; font-size:0.9rem; font-weight:600; margin-top:12px}
+    input[type="text"], textarea, input[type="date"], input[type="file"]{
+      width:100%; padding:12px 14px; border-radius:12px; border:1px solid #e7ecf8;
+      background:var(--surface); font-size:0.95rem; margin-top:8px;
+    }
+    textarea{resize:vertical; min-height:84px}
+    .form-row{display:flex; gap:12px}
+    .form-row > *{flex:1}
+
+    .btn-primary{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:12px 18px; border-radius:12px; border:none; cursor:pointer;
+      font-weight:700; color:white; background:linear-gradient(90deg,var(--primary),var(--accent));
+      margin-top:18px;
+      transition:transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-primary:hover{transform:translateY(-2px); box-shadow:0 6px 14px rgba(11,97,211,0.25);}
+
+    #result{
+      margin-top:18px; padding:14px; border-radius:12px; background:var(--surface); border:1px solid #eef2ff;
+      font-size:0.95rem;
     }
 
-    input, textarea {
-      width: 100%;
-      padding: 14px;
-      margin-top: 8px;
-      border-radius: 10px;
-      border: 1px solid #d1d5db;
-      background: #f9fafb;
-      color: #111827;
-      font-size: 0.95rem;
-      transition: all 0.3s;
+    /* QR code */
+    .qr-wrap img{max-width:220px; margin-top:10px}
+    .download-qr{
+      margin-top:12px;
+      padding:10px 16px;
+      border-radius:12px;
+      border:none;
+      cursor:pointer;
+      font-weight:600;
+      color:white;
+      background:linear-gradient(90deg,var(--primary),var(--accent));
+      transition:transform 0.2s ease, box-shadow 0.2s ease;
     }
-
-    input:focus, textarea:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 6px rgba(37,99,235,0.4);
-      outline: none;
-      background: #fff;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 22px;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      color: #fff;
-      background: linear-gradient(90deg, #2563eb, #06b6d4);
-      transition: all 0.3s ease;
-    }
-
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 18px rgba(37,99,235,0.4);
-    }
-
-    #result {
-      margin-top: 20px;
-      background: #f9fafb;
-      padding: 18px;
-      border-radius: 12px;
-      border: 1px solid #e5e7eb;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      word-wrap: break-word;
-    }
-
-    #accountMsg {
-      text-align: center;
-      font-size: 0.9rem;
-      margin-top: 10px;
-      color: #6b7280;
-    }
-
-    a { color: #2563eb; text-decoration: none; font-weight: 500; }
-    a:hover { text-decoration: underline; }
+    .download-qr:hover{transform:translateY(-2px); box-shadow:0 6px 14px rgba(11,97,211,0.25);}
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Add Certificate</h1>
-    <button id="connectBtn">Connect MetaMask</button>
-    <p id="accountMsg"></p>
+  <div class="frame">
 
-    <label>Student Name
-      <input id="name" type="text" placeholder="e.g. Inzamam al Sameer" />
-    </label>
-    <label>Student Details
-      <textarea id="details" rows="3" placeholder="e.g. B.E CS - Roll 510422149017"></textarea>
-    </label>
-    <label>Date of Birth
-      <input id="dob" type="date" />
-    </label>
-    <label>Certificate File
-      <input id="file" type="file" accept=".pdf,image/*" />
-    </label>
+    <!-- header -->
+    <div class="header">
+      <div class="brand">
+        <div class="logo">AEC</div>
+        <div class="org">
+          <h2>Aruani Engineering College</h2>
+          <p>Certification Portal</p>
+        </div>
+      </div>
 
-    <button id="uploadBtn">Upload to IPFS & Save</button>
-    <div id="result"></div>
+      <div class="top-actions">
+        <button id="connectBtn" class="connect-btn">Connect MetaMask</button>
+        <div id="accountDisplay">Not connected</div>
+      </div>
+    </div>
+
+    <!-- main form -->
+    <section class="card">
+      <h1>Add Certificate</h1>
+
+      <label for="name">Student Name</label>
+      <input id="name" type="text" placeholder="e.g. John Doe" />
+
+      <label for="details">Student Details</label>
+      <textarea id="details" rows="3" placeholder="e.g. B.E CSE - Roll 123456"></textarea>
+
+      <div class="form-row">
+        <div>
+          <label for="dob">Date of Birth</label>
+          <input id="dob" type="date" />
+        </div>
+        <div>
+          <label for="file">Certificate File</label>
+          <input id="file" type="file" accept=".pdf,image/*" />
+        </div>
+      </div>
+
+      <button id="uploadBtn" class="btn-primary">Upload to IPFS & Save</button>
+
+      <div id="result"></div>
+    </section>
   </div>
 
-  <!-- ✅ Script unchanged (same features as before) -->
   <script>
-    const CONTRACT_ADDRESS = "0xA0ff398E0c7e7f827196Aba550D3eF3F243c330a";
-    const CONTRACT_ABI = [
-      {
-        "inputs":[
-          {"internalType":"string","name":"_certId","type":"string"},
-          {"internalType":"string","name":"_name","type":"string"},
-          {"internalType":"string","name":"_details","type":"string"},
-          {"internalType":"string","name":"_dob","type":"string"},
-          {"internalType":"string","name":"_ipfsHash","type":"string"}
-        ],
-        "name":"addCertificate",
-        "outputs":[],
-        "stateMutability":"nonpayable",
-        "type":"function"
-      }
+    const CONTRACT_ADDRESS = "0x5777a4468c5566789FA96fcc853114b6Ef7F3491";
+    const CONTRACT_ABI =[ 
+      {"inputs":[{"internalType":"string","name":"","type":"string"}],"name":"certificates","outputs":[{"internalType":"string","name":"studentName","type":"string"},{"internalType":"string","name":"studentDetails","type":"string"},{"internalType":"string","name":"dateOfBirth","type":"string"},{"internalType":"string","name":"ipfsHash","type":"string"},{"internalType":"address","name":"uploader","type":"address"}],"stateMutability":"view","type":"function","constant":true},
+      {"inputs":[{"internalType":"string","name":"_certId","type":"string"},{"internalType":"string","name":"_name","type":"string"},{"internalType":"string","name":"_details","type":"string"},{"internalType":"string","name":"_dob","type":"string"},{"internalType":"string","name":"_ipfsHash","type":"string"}],"name":"addCertificate","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"inputs":[{"internalType":"string","name":"_certId","type":"string"}],"name":"getCertificate","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function","constant":true}
     ];
 
     let web3, account, contract;
@@ -166,7 +190,7 @@
       const accounts = await web3.eth.getAccounts();
       account = accounts[0];
       contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
-      document.getElementById('accountMsg').innerText = 'Connected: ' + account;
+      document.getElementById('accountDisplay').innerText = 'Connected: ' + account;
     }
 
     async function uploadFileToServer(file) {
@@ -203,19 +227,17 @@
           <b>Certificate ID:</b> ${certId}<br>
           <b>Verify:</b> <a href="${verifyUrl}" target="_blank">${verifyUrl}</a><br>
           <b>File:</b> <a href="${ipfsUrl}" target="_blank">${ipfsUrl}</a>
-          <div id="qr"></div>`
+          <div id="qr" class="qr-wrap"></div>`
         );
 
         QRCode.toDataURL(verifyUrl).then(url => {
           const img = document.createElement('img');
           img.src = url;
-          img.style.maxWidth = '220px';
-          img.style.marginTop = '12px';
           document.getElementById('qr').appendChild(img);
 
           const downloadBtn = document.createElement('button');
           downloadBtn.textContent = 'Download QR Code';
-          downloadBtn.style.marginTop = '10px';
+          downloadBtn.className = 'download-qr';
           downloadBtn.onclick = () => {
             const a = document.createElement('a');
             a.href = url;

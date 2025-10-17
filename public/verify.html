@@ -1,172 +1,154 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Verify Certificate</title>
+  <title>Aruani Engineering College — Verify Certificate</title>
+
+  <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/web3@1.9.0/dist/web3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-
-    * { box-sizing: border-box; }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f3f4f6;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+    :root{
+      --primary:#0b61d3;
+      --accent:#06b6d4;
+      --muted:#6b7280;
+      --card:#ffffff;
+      --surface:#f9fafb;
+      --radius:14px;
+      --max-width:980px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%; margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial; -webkit-font-smoothing:antialiased}
+    body{
+      display:flex; align-items:center; justify-content:center;
+      background: linear-gradient(270deg, #0b61d3, #06b6d4, #4f46e5);
+      background-size:600% 600%;
+      animation: gradientMove 18s ease infinite;
+      color:#0f1724; padding:28px;
+    }
+    @keyframes gradientMove {
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
     }
 
-    .container {
-      width: 100%;
-      max-width: 600px;
-      background: #fff;
-      border-radius: 16px;
-      padding: 40px 30px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-      animation: fadeIn 0.7s ease;
+    .container{
+      width:100%; max-width:var(--max-width);
+      background: rgba(255,255,255,0.92);
+      border-radius:var(--radius);
+      box-shadow: 0 10px 40px rgba(2,6,23,0.15);
+      overflow:hidden;
+      animation: fadeInUp 900ms ease;
+    }
+    @keyframes fadeInUp { from{opacity:0; transform:translateY(16px)} to{opacity:1; transform:none} }
+
+    .header{
+      display:flex; align-items:center; justify-content:space-between; gap:16px;
+      padding:20px 26px; border-bottom:1px solid rgba(11,97,211,0.06);
+      background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,255,255,0.6));
+    }
+    .brand{display:flex; gap:12px; align-items:center}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.95rem}
+    .org h1{margin:0;font-size:1.05rem;color:var(--primary)}
+    .org p{margin:0;color:var(--muted);font-size:0.9rem}
+
+    .content{padding:26px}
+    .card{
+      background:var(--card); border-radius:12px; padding:20px;
+      box-shadow:0 8px 28px rgba(2,6,23,0.06);
+    }
+    h2{margin:0 0 8px 0; color:var(--primary)}
+    label{display:block;margin-top:12px;font-weight:600}
+    input[type="text"]{width:100%; padding:12px;border-radius:10px;border:1px solid #e7ecf8;background:var(--surface); margin-top:8px}
+
+    .btn-primary{
+      margin-top:12px;padding:12px 16px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--primary),var(--accent));color:white;font-weight:700;cursor:pointer;
+      transition:transform .15s ease, box-shadow .15s ease;
+    }
+    .btn-primary:hover{transform:translateY(-3px); box-shadow:0 8px 18px rgba(11,97,211,0.12)}
+
+    #output{
+      margin-top:14px;padding:14px;border-radius:10px;background:var(--surface);border:1px solid #eef2ff;font-size:0.95rem;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .qr-wrap img{max-width:220px; display:block; margin-top:12px}
+    .download-qr{
+      margin-top:12px; padding:10px 16px; border-radius:10px; border:none; cursor:pointer; font-weight:700;
+      color:white; background:linear-gradient(90deg,var(--primary),var(--accent));
     }
 
-    h1 {
-      text-align: center;
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 25px;
-      color: #2563eb;
+    /* responsive */
+    @media (max-width:700px){
+      .header{flex-direction:column; align-items:flex-start; gap:10px}
+      .logo{width:48px;height:48px}
+      .container{padding:8px}
     }
-
-    label {
-      font-size: 0.9rem;
-      font-weight: 600;
-      display: block;
-      margin-top: 18px;
-      color: #374151;
-    }
-
-    input {
-      width: 100%;
-      padding: 14px;
-      margin-top: 8px;
-      border-radius: 10px;
-      border: 1px solid #d1d5db;
-      background: #f9fafb;
-      color: #111827;
-      font-size: 0.95rem;
-      transition: all 0.3s;
-    }
-
-    input:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 6px rgba(37,99,235,0.4);
-      outline: none;
-      background: #fff;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 22px;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      color: #fff;
-      background: linear-gradient(90deg, #2563eb, #06b6d4);
-      transition: all 0.3s ease;
-    }
-
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 18px rgba(37,99,235,0.4);
-    }
-
-    #output {
-      margin-top: 20px;
-      background: #f9fafb;
-      padding: 18px;
-      border-radius: 12px;
-      border: 1px solid #e5e7eb;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      word-wrap: break-word;
-    }
-
-    a { color: #2563eb; text-decoration: none; font-weight: 500; }
-    a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Verify Certificate</h1>
-    <label>Certificate ID
-      <input id="certId" type="text" placeholder="Enter certificate ID" />
-    </label>
-    <button id="verifyBtn">Verify</button>
-    <div id="output"></div>
+  <div class="container" role="application" aria-labelledby="title">
+    <header class="header" role="banner">
+      <div class="brand" aria-hidden="false">
+        <div class="logo">AEC</div>
+        <div class="org">
+          <h1 id="title">Aruani Engineering College</h1>
+          <p>Certificate Verification</p>
+        </div>
+      </div>
+
+      <!-- intentionally no MetaMask connect button on this page per your request -->
+      <div style="color:var(--muted); font-size:0.95rem">Secure & verifiable — IPFS + blockchain</div>
+    </header>
+
+    <main class="content" role="main">
+      <section class="card" aria-labelledby="verifyTitle">
+        <h2 id="verifyTitle">Verify Certificate</h2>
+
+        <label for="certId">Certificate ID</label>
+        <input id="certId" type="text" placeholder="Enter certificate ID" />
+
+        <button id="verifyBtn" class="btn-primary" type="button">Verify</button>
+
+        <div id="output" aria-live="polite"></div>
+      </section>
+    </main>
   </div>
 
   <script>
-    const CONTRACT_ADDRESS = "0xA0ff398E0c7e7f827196Aba550D3eF3F243c330a";
+    // Contract (preserved)
+    const CONTRACT_ADDRESS = "0x5777a4468c5566789FA96fcc853114b6Ef7F3491";
     const CONTRACT_ABI = [
-      {
-        "inputs": [
-          { "internalType": "string", "name": "", "type": "string" }
-        ],
-        "name": "certificates",
-        "outputs": [
-          { "internalType": "string", "name": "studentName", "type": "string" },
-          { "internalType": "string", "name": "studentDetails", "type": "string" },
-          { "internalType": "string", "name": "dateOfBirth", "type": "string" },
-          { "internalType": "string", "name": "ipfsHash", "type": "string" },
-          { "internalType": "address", "name": "uploader", "type": "address" }
-        ],
-        "stateMutability": "view",
-        "type": "function",
-        "constant": true
-      },
-      {
-        "inputs": [
-          { "internalType": "string", "name": "_certId", "type": "string" },
-          { "internalType": "string", "name": "_name", "type": "string" },
-          { "internalType": "string", "name": "_details", "type": "string" },
-          { "internalType": "string", "name": "_dob", "type": "string" },
-          { "internalType": "string", "name": "_ipfsHash", "type": "string" }
-        ],
-        "name": "addCertificate",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          { "internalType": "string", "name": "_certId", "type": "string" }
-        ],
-        "name": "getCertificate",
-        "outputs": [
-          { "internalType": "string", "name": "", "type": "string" },
-          { "internalType": "string", "name": "", "type": "string" },
-          { "internalType": "string", "name": "", "type": "string" },
-          { "internalType": "string", "name": "", "type": "string" },
-          { "internalType": "address", "name": "", "type": "address" }
-        ],
-        "stateMutability": "view",
-        "type": "function",
-        "constant": true
-      }
+      {"inputs":[{"internalType":"string","name":"","type":"string"}],"name":"certificates","outputs":[{"internalType":"string","name":"studentName","type":"string"},{"internalType":"string","name":"studentDetails","type":"string"},{"internalType":"string","name":"dateOfBirth","type":"string"},{"internalType":"string","name":"ipfsHash","type":"string"},{"internalType":"address","name":"uploader","type":"address"}],"stateMutability":"view","type":"function","constant":true},
+      {"inputs":[{"internalType":"string","name":"_certId","type":"string"},{"internalType":"string","name":"_name","type":"string"},{"internalType":"string","name":"_details","type":"string"},{"internalType":"string","name":"_dob","type":"string"},{"internalType":"string","name":"_ipfsHash","type":"string"}],"name":"addCertificate","outputs":[],"stateMutability":"nonpayable","type":"function"},
+      {"inputs":[{"internalType":"string","name":"_certId","type":"string"}],"name":"getCertificate","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function","constant":true}
     ];
 
-    const web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:7545"));
-    const contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+    let web3, contract;
+
+    function useLocalProvider() {
+      // fallback to a local provider (same as your earlier behavior)
+      const provider = new Web3.providers.HttpProvider("http://127.0.0.1:7545");
+      web3 = new Web3(provider);
+      contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+    }
+
+    async function initWeb3IfNeeded() {
+      if (web3 && contract) return;
+      if (window.ethereum) {
+        try {
+          web3 = new Web3(window.ethereum);
+          contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+        } catch (e) {
+          useLocalProvider();
+        }
+      } else {
+        useLocalProvider();
+      }
+    }
 
     function escapeHtml(text) {
       if (typeof text !== 'string') return text;
@@ -175,12 +157,17 @@
 
     async function onVerifyClicked() {
       try {
+        await initWeb3IfNeeded();
         const id = document.getElementById('certId').value.trim();
         if (!id) { alert('Enter certificate ID'); return; }
 
+        const out = document.getElementById('output');
+        out.innerHTML = 'Checking certificate...';
+
         const res = await contract.methods.getCertificate(id).call();
+        // returned: [name, details, dob, ipfsHash, uploader]
         if (!res || !res[0]) {
-          document.getElementById('output').innerHTML = '<b>Certificate not found.</b>';
+          out.innerHTML = '<b>Certificate not found.</b>';
           return;
         }
 
@@ -192,38 +179,59 @@
 
         const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
 
-        document.getElementById('output').innerHTML =
-          `<b>Name:</b> ${name}<br>
+        out.innerHTML =
+          `<div><b>Name:</b> ${name}<br>
            <b>Details:</b> ${details}<br>
            <b>DOB:</b> ${dob}<br>
            <b>Department Id:</b> ${uploader}<br>
-           <b>File:</b> <a href="${ipfsUrl}" target="_blank">${ipfsUrl}</a>
-           <div id="qr" style="margin-top:12px"></div>`;
+           <b>File:</b> <a href="${ipfsUrl}" target="_blank" rel="noopener">${ipfsUrl}</a></div>
+          <div id="qr" class="qr-wrap" aria-hidden="false"></div>`;
 
+        // generate QR code pointing to the ipfs file
         QRCode.toDataURL(ipfsUrl).then(url => {
+          const qrWrap = document.getElementById('qr');
+          qrWrap.innerHTML = '';
           const img = document.createElement('img');
           img.src = url;
-          img.style.maxWidth = '220px';
-          document.getElementById('qr').appendChild(img);
+          qrWrap.appendChild(img);
 
           const downloadBtn = document.createElement('button');
           downloadBtn.textContent = 'Download QR Code';
-          downloadBtn.style.marginTop = '10px';
+          downloadBtn.className = 'download-qr';
           downloadBtn.onclick = () => {
             const a = document.createElement('a');
             a.href = url;
             a.download = `${id}_QRCode.png`;
             a.click();
           };
-          document.getElementById('qr').appendChild(downloadBtn);
+          qrWrap.appendChild(downloadBtn);
+        }).catch(err => {
+          console.warn('QR generation failed', err);
         });
 
       } catch (err) {
-        document.getElementById('output').innerHTML = 'Error: ' + (err.message || err);
+        console.error(err);
+        document.getElementById('output').innerText = 'Error: ' + (err.message || err);
       }
     }
 
     document.getElementById('verifyBtn').addEventListener('click', onVerifyClicked);
+
+    // Auto-run verify if ?id=... is present
+    (async function boot() {
+      try {
+        await initWeb3IfNeeded();
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        if (id) {
+          document.getElementById('certId').value = id;
+          // let UI paint first
+          setTimeout(() => { onVerifyClicked(); }, 60);
+        }
+      } catch (e) {
+        console.warn('boot error', e);
+      }
+    })();
   </script>
 </body>
 </html>

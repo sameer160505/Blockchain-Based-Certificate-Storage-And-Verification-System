@@ -1,7 +1,7 @@
 // public/app.js
 
-const CONTRACT_ADDRESS = "0xdD90A7D5F076e6E4508991D627afFeed01164978";
-const CONTRACT_ABI = [
+const CONTRACT_ADDRESS = "0x5777a4468c5566789FA96fcc853114b6Ef7F3491";
+const CONTRACT_ABI = [[
     {
       "inputs": [
         {
@@ -39,8 +39,7 @@ const CONTRACT_ABI = [
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -112,9 +111,9 @@ const CONTRACT_ABI = [
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     }
+  ]
   ];
 
 let web3, account, contract;
