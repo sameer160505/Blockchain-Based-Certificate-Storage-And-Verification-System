@@ -1,5 +1,3 @@
-# Blockchain-Based-Certificate-Storage-And-Verification-System
-
 # 🧾 Blockchain-Based Certificate Storage and Verification System
 
 A **Full-Stack Decentralized Application (DApp)** designed to **issue, store, and verify certificates** securely using the **Ethereum Blockchain** and **IPFS**.
@@ -53,31 +51,27 @@ Blockchain (Truffle + Ganache)
 ↓
 MetaMask (Wallet & Transactions)
 
-yaml
-Copy code
-
 ---
 
 ## 📁 Project Structure
 
 contracts/
-└── Certificate.sol # Solidity Smart Contract
+└── Certificate.sol           # Solidity Smart Contract
 
 migrations/
-└── 2_deploy_contracts.js # Contract Deployment Script
+└── 2_deploy_contracts.js     # Contract Deployment Script
 
 public/
-├── index.html # Add Certificate Page
-├── verify.html # Verify Certificate Page
-└── app.js # Frontend Logic
+├── index.html                # Add Certificate Page
+├── verify.html               # Verify Certificate Page
+└── app.js                    # Frontend Logic
 
-server.js # Backend API Server
-.env # Environment Variables (Pinata JWT, PORT)
-truffle-config.js # Blockchain Configuration
-package.json # Node.js Dependencies
+server.js                      # Backend API Server
+.env                           # Environment Variables (Pinata JWT, PORT)
+truffle-config.js              # Blockchain Configuration
+package.json                   # Node.js Dependencies
 
-php
-Copy code
+````
 
 ---
 
@@ -119,81 +113,100 @@ contract CertificateStorage {
         return (cert.studentName, cert.studentDetails, cert.dateOfBirth, cert.ipfsHash, cert.uploader);
     }
 }
+````
 
-⚙️ How It Works
+---
 
-🧾 Add Certificate Flow
-Connect MetaMask to the Ganache local blockchain.
+## ⚙️ How It Works
 
-Enter student details and upload the certificate file.
+### 🧾 Add Certificate Flow
 
-File is uploaded to IPFS via the backend using Pinata.
+1. Connect **MetaMask** to the **Ganache** local blockchain.
+2. Enter student details and upload the certificate file.
+3. File is uploaded to **IPFS** via the backend using **Pinata**.
+4. Smart contract stores metadata (name, DOB, IPFS hash) on **Ethereum**.
+5. A unique Certificate ID and QR code are generated for verification.
 
-Smart contract stores metadata (name, DOB, IPFS hash) on Ethereum.
+### 🔍 Verify Certificate Flow
 
-A unique Certificate ID and QR code are generated for verification.
+1. Enter the **Certificate ID** or scan the **QR code**.
+2. The system retrieves data directly from the **blockchain**.
+3. Displays the certificate’s **IPFS link** for authenticity verification.
 
-🔍 Verify Certificate Flow
-Enter the Certificate ID or scan the QR code.
+---
 
-The system retrieves data directly from the blockchain.
+## 🛠️ Installation & Setup
 
-Displays the certificate’s IPFS link for authenticity verification.
+### 1️⃣ Clone the Repository
 
-🛠️ Installation & Setup
-1️⃣ Clone the Repository
-bash
-Copy code
+```bash
 git clone https://github.com/<your-username>/Blockchain-Based-Certificate-Storage-And-Verification-System.git
 cd Blockchain-Based-Certificate-Storage-And-Verification-System
-2️⃣ Install Dependencies
-bash
-Copy code
-npm install
-3️⃣ Configure Environment Variables
-Create a .env file in the root directory:
+```
 
-ini
-Copy code
+### 2️⃣ Install Dependencies
+
+```bash
+npm install
+```
+
+### 3️⃣ Configure Environment Variables
+
+Create a `.env` file in the root directory:
+
+```
 PINATA_JWT=your_pinata_jwt
 PORT=5000
-4️⃣ Compile & Deploy Smart Contract
-bash
-Copy code
+```
+
+### 4️⃣ Compile & Deploy Smart Contract
+
+```bash
 truffle compile
 truffle migrate
-5️⃣ Connect MetaMask
-Add a Custom RPC for your local Ganache network.
+```
 
-Import one of the Ganache accounts.
+### 5️⃣ Connect MetaMask
 
-6️⃣ Run the Backend Server
-bash
-Copy code
+* Add a **Custom RPC** for your local **Ganache network**.
+* Import one of the Ganache accounts.
+
+### 6️⃣ Run the Backend Server
+
+```bash
 node server.js
-7️⃣ Access the Application
-Open public/index.html → Add Certificate
+```
 
-Open public/verify.html → Verify Certificate
+### 7️⃣ Access the Application
 
-🔒 Security Highlights
-Sensitive data (JWT, API keys) stored securely in .env.
+* Open `public/index.html` → *Add Certificate*
+* Open `public/verify.html` → *Verify Certificate*
 
-Blockchain immutability ensures all records are tamper-proof.
+---
 
-MetaMask ensures secure, user-verified transactions.
+## 🔒 Security Highlights
 
-🌱 Future Enhancements
-🧩 React.js Frontend for a modern and responsive UI.
+* Sensitive data (JWT, API keys) stored securely in `.env`.
+* Blockchain immutability ensures all records are tamper-proof.
+* MetaMask ensures secure, user-verified transactions.
 
-🔑 Role-Based Access (Admin/Issuer/Verifier).
+---
 
-⏳ Certificate Expiry & Revocation mechanisms.
+## 🌱 Future Enhancements
 
-🕓 On-Chain Timestamps for better tracking and auditing.
+* 🧩 **React.js Frontend** for a modern and responsive UI.
+* 🔑 **Role-Based Access** (Admin/Issuer/Verifier).
+* ⏳ **Certificate Expiry & Revocation** mechanisms.
+* 🕓 **On-Chain Timestamps** for better tracking and auditing.
 
-👨‍💻 Author
-K. Inzamam Al Sameer
+---
+
+## 👨‍💻 Author
+
+**K. Inzamam Al Sameer**
 🎓 Cyber Security Engineering Student
 💻 Blockchain & Full-Stack Developer
 
+
+Would you like me to replace `<your-username>` with your actual GitHub username and give this as a ready-to-download `README.md` file (so you can upload directly to your repo)?
+```
