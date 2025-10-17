@@ -10,19 +10,29 @@ This project implements a Blockchain-Based Certificate Verification System where
 Key Features
 
 •	Smart Contract Storage – Stores certificate data on Ethereum (Ganache).
+
 •	Decentralized File Uploads – Uses IPFS via Pinata for permanent file hosting.
+
 •	MetaMask Integration – Handles wallet connection and transaction approval.
+
 •	Secure Backend API – Node.js + Express server uploads to Pinata using JWT.
+
 •	Interactive Frontend – HTML/JS interface for adding and verifying certificates.
+
 •	QR Code Generation – Each certificate includes a scannable QR for verification.
+
 •	Immutable Records – Certificates cannot be altered once uploaded.
 
 Tech Stack
 
 •	Frontend: HTML, CSS, JavaScript, Web3.js – User interface, wallet connection, QR generation
+
 •	Backend: Node.js, Express, Axios, Multer – File upload and Pinata IPFS integration
+
 •	Blockchain: Solidity, Truffle, Ganache – Smart contract and local Ethereum testing
+
 •	Storage: IPFS (Pinata) – Decentralized certificate file storage
+
 •	Wallet: MetaMask – Blockchain transaction management
 
 System Architecture
@@ -87,43 +97,61 @@ Working Process
 Add Certificate Flow:
 
 •	Connect MetaMask to Ganache.
+
 •	Enter student details and upload the certificate file.
+
 •	File is uploaded to IPFS via backend and Pinata.
+
 •	Smart contract stores IPFS hash and metadata on blockchain.
+
 •	A unique Certificate ID and QR code are generated.
 
 Verify Certificate Flow:
 
 •	Enter Certificate ID or scan QR code.
+
 •	System retrieves certificate data directly from blockchain.
+
 •	IPFS link is displayed for verification.
 
 Installation & Setup
 
 •	Clone the repository using git clone and navigate into the directory.
+
 •	Run 'npm install' to install dependencies.
+
 •	Create a .env file with Pinata JWT and server port.
+
 •	Compile and deploy the smart contract using Truffle.
+
 •	Configure MetaMask to connect to the local Ganache network.
+
 •	Start the backend server using 'node server.js'.
+
 •	Access index.html and verify.html in the browser for testing.
 
 Security Highlights
 
 •	Pinata JWT stored securely in .env (never exposed to frontend).
+
 •	Blockchain immutability ensures certificate data cannot be altered.
+
 •	MetaMask transactions add user-side security and verification.
 
 Future Enhancements
 
 •	React-based frontend for better UI/UX.
+
 •	Certificate revocation or expiration feature.
+
 •	Admin authentication and role-based access.
+
 •	On-chain timestamps for tracking issuance dates.
 
 Author
 
 K. Inzamam Al Sameer
+
 Cyber Security Engineering Student  Blockchain & Full-Stack Developer
 
 
