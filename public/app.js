@@ -1,6 +1,6 @@
 // public/app.js
 
-const CONTRACT_ADDRESS = "0x5777a4468c5566789FA96fcc853114b6Ef7F3491";
+const CONTRACT_ADDRESS = "YOUR_CONTRACT_ADDRESS";
 const CONTRACT_ABI = [[
     {
       "inputs": [
