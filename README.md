@@ -1,51 +1,50 @@
 # Blockchain-Based-Certificate-Storage-And-Verification-System
 Blockchain Based Certificate Storage And Verification  System
 
+A full-stack decentralized application (DApp) for issuing and verifying certificates securely using Ethereum Blockchain and IPFS.
+
 Overview
-This project is a Blockchain-based Certificate Storage And  Verification System built using Ethereum smart contracts. It allows users to upload, store, and verify certificates securely on the blockchain using MetaMask for transactions and IPFS (via Pinata) for file storage.
 
-Features
-•	Add Certificate Page — Connects MetaMask, uploads certificates to IPFS, auto-generates certificate ID, stores details on blockchain, and generates QR code.
-•	Verify Certificate Page — Allows verification by certificate ID or QR code, fetches certificate details from blockchain, and displays document link and QR code.
+This project implements a Blockchain-Based Certificate Verification System where certificates are stored on a decentralized network, ensuring authenticity and preventing forgery. The frontend allows users to add and verify certificates, the backend securely uploads certificates to IPFS via Pinata, and the blockchain layer stores immutable metadata such as student details, IPFS hash, and certificate ID.
 
-Tools & Technologies
-1.	MetaMask — For wallet connection & signing blockchain transactions.
-2.	Ganache — Local Ethereum blockchain for development/testing.
-3.	Truffle — Framework for compiling, deploying, and testing smart contracts.
-4.	Node.js + Express — Backend server for file uploads and API handling.
-5.	Pinata — To store certificate files on IPFS (decentralized storage).
-6.	VS Code — Code editor.
-7.	QR Code Generator (JavaScript) — For generating verification QR codes.
-   
+Key Features
+
+•	Smart Contract Storage – Stores certificate data on Ethereum (Ganache).
+•	Decentralized File Uploads – Uses IPFS via Pinata for permanent file hosting.
+•	MetaMask Integration – Handles wallet connection and transaction approval.
+•	Secure Backend API – Node.js + Express server uploads to Pinata using JWT.
+•	Interactive Frontend – HTML/JS interface for adding and verifying certificates.
+•	QR Code Generation – Each certificate includes a scannable QR for verification.
+•	Immutable Records – Certificates cannot be altered once uploaded.
+
+Tech Stack
+
+•	Frontend: HTML, CSS, JavaScript, Web3.js – User interface, wallet connection, QR generation
+•	Backend: Node.js, Express, Axios, Multer – File upload and Pinata IPFS integration
+•	Blockchain: Solidity, Truffle, Ganache – Smart contract and local Ethereum testing
+•	Storage: IPFS (Pinata) – Decentralized certificate file storage
+•	Wallet: MetaMask – Blockchain transaction management
+
+System Architecture
+
+Frontend (HTML + JS) → Backend (Node.js + Express) → IPFS via Pinata (File Storage) → Blockchain (Truffle + Ganache) → MetaMask (Wallet & Transactions)
+
 Project Structure
 
-blockchain-certificates/
-│
-├── contracts/
-│   └── Certificate.sol
-├── migrations/
-│   └── 2_deploy_contracts.js
-├── public/
-│   ├── index.html
-│   ├── verify.html
-│   ├── app.js
-├── server.js
-├── .env
-├── truffle-config.js
-├── package.json
-└── README.md
+contracts/
+  └── Certificate.sol – Solidity smart contract
+migrations/
+  └── 2_deploy_contracts.js – Deployment script
+public/
+  ├── index.html – Add Certificate Page
+  ├── verify.html – Verify Certificate Page
+  └── app.js – Frontend logic
+server.js – Backend API server
+.env – Pinata JWT and environment variables
+truffle-config.js – Blockchain configuration
+package.json – Node.js dependencies
 
-Setup Instructions (Step-by-Step)
-1.	Install required software: Chrome, MetaMask, Node.js, Ganache, VS Code, Truffle.
-2.	Clone the repository and install Node dependencies using npm install.
-3.	Create a .env file with your Pinata JWT and port configuration.
-4.	Compile and deploy smart contract with Truffle.
-5.	Copy contract address and ABI from build/contracts/CertificateStorage.json and paste into app.js.
-6.	Start backend using node server.js.
-7.	Open MetaMask, add Ganache network, and import Ganache account.
-8.	Visit http://localhost:4000/index.html to add and verify certificates.
-   
-Smart Contract (CertificateStorage.sol)
+Smart Contract
 
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
@@ -72,20 +71,60 @@ contract CertificateStorage {
         certificates[_certId] = Certificate(_name, _details, _dob, _ipfsHash, msg.sender);
     }
 
-    function getCertificate(string memory _certId) public view returns (
-        string memory,
-        string memory,
-        string memory,
-        string memory,
-        address
-    ) {
+    function getCertificate(string memory _certId)
+        public
+        view
+        returns (string memory, string memory, string memory, string memory, address)
+    {
         Certificate memory cert = certificates[_certId];
         require(bytes(cert.studentName).length != 0, "Certificate not found");
         return (cert.studentName, cert.studentDetails, cert.dateOfBirth, cert.ipfsHash, cert.uploader);
     }
 }
 
+Working Process
+
+Add Certificate Flow:
+
+•	Connect MetaMask to Ganache.
+•	Enter student details and upload the certificate file.
+•	File is uploaded to IPFS via backend and Pinata.
+•	Smart contract stores IPFS hash and metadata on blockchain.
+•	A unique Certificate ID and QR code are generated.
+
+Verify Certificate Flow:
+
+•	Enter Certificate ID or scan QR code.
+•	System retrieves certificate data directly from blockchain.
+•	IPFS link is displayed for verification.
+
+Installation & Setup
+
+•	Clone the repository using git clone and navigate into the directory.
+•	Run 'npm install' to install dependencies.
+•	Create a .env file with Pinata JWT and server port.
+•	Compile and deploy the smart contract using Truffle.
+•	Configure MetaMask to connect to the local Ganache network.
+•	Start the backend server using 'node server.js'.
+•	Access index.html and verify.html in the browser for testing.
+
+Security Highlights
+
+•	Pinata JWT stored securely in .env (never exposed to frontend).
+•	Blockchain immutability ensures certificate data cannot be altered.
+•	MetaMask transactions add user-side security and verification.
+
+Future Enhancements
+
+•	React-based frontend for better UI/UX.
+•	Certificate revocation or expiration feature.
+•	Admin authentication and role-based access.
+•	On-chain timestamps for tracking issuance dates.
+
 Author
 
-K. Inzamam Al Sameer — Blockchain Developer & web developer
+K. Inzamam Al Sameer
+Cyber Security Engineering Student  Blockchain & Full-Stack Developer
+
+
 
